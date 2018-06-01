@@ -10,10 +10,13 @@
   }
 
   function handleLinkClick(link) {
-    var message = link.getAttribute("data-confirm");
-    if(message && !window.confirm(message)) {
-        return;
-    }
+    var phoenixLinkEvent = document.createEvent('Event');
+    phoenixLinkEvent.initEvent('phoenix.link', true, true);
+		var cancelled = !link.dispatchEvent(phoenixLinkEvent);
+		
+		if(cancelled) {
+			return;
+		}
 
     var to = link.getAttribute("data-to"),
         method = buildHiddenInput("_method", link.getAttribute("data-method")),
@@ -46,4 +49,11 @@
       }
     }
   }, false);
+  
+  window.addEventListener('phoenix.link', function (e) {
+    var message = e.target.getAttribute("data-confirm");
+    if(message && !window.confirm(message)) {
+      e.preventDefault();
+    }
+	}, false);
 })();
